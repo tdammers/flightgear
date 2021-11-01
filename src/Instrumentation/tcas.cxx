@@ -591,7 +591,14 @@ static bool checkTransponderLocal(const SGPropertyNode* pModel, float velocityKt
         // For MP aircraft (name='multiplayer') that are being ignored.
         return false;
     }
-    if (pModel->getNameString() == "aircraft")
+    if (pModel->getNameString() == "swift")
+    {
+        bool xpdr_on = pModel->getBoolValue("swift/transponder/c-mode", false);
+        if (!xpdr_on) return false;
+        o_altFt = pModel->getDoubleValue("position/altitude-ft");
+        return true;
+    }
+    else if (pModel->getNameString() == "aircraft")
     {
         /* assume all non-MP and non-Swift (i.e. AI) aircraft have their transponder switched off while taxiing/parking
          * (at low speed) */
@@ -599,7 +606,9 @@ static bool checkTransponderLocal(const SGPropertyNode* pModel, float velocityKt
         o_altFt = pModel->getDoubleValue("position/altitude-ft");
         return true;
     }
-    o_altFt = pModel->getIntValue("instrumentation/transponder/altitude", -9999);
+    else {
+        o_altFt = pModel->getIntValue("instrumentation/transponder/altitude", -9999);
+    }
     // must have Mode C (altitude) transponder to be visible.
     // "-9999" is a special value used by src/Instrumentation/transponder.cxx to indicate the non-transmission of a value.
     return (o_altFt != -9999);
