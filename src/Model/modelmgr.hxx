@@ -17,6 +17,7 @@
 // Don't pull in headers, since we don't need them here.
 class SGPropertyNode;
 class SGModelPlacement;
+class FGMarker;
 
 
 /**
@@ -51,6 +52,7 @@ public:
         SGPropertyNode_ptr pitch_deg_node;
         SGPropertyNode_ptr heading_deg_node;
         SGPropertyNode_ptr loaded_node;
+        FGMarker * marker = nullptr;
         bool shadow = false;
 
         bool checkLoaded() const;

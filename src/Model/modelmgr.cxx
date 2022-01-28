@@ -111,6 +111,10 @@ void FGModelMgr::shutdown()
             scene_graph->removeChild(_instances[i]->model->getSceneGraph());
         }
 
+        if (_instances[i]->marker) {
+            delete _instances[i]->marker;
+        }
+
         delete _instances[i];
     }
 }
@@ -127,6 +131,7 @@ FGModelMgr::add_model (SGPropertyNode * node)
     const std::string internal_model{node->getStringValue("internal-model", "external")};
  
   osg::Node *object;
+  FGMarker *marker = nullptr;
 
   Instance * instance = new Instance;
   instance->loaded_node = node->addChild("loaded");
@@ -141,7 +146,8 @@ FGModelMgr::add_model (SGPropertyNode * node)
     float font_size = node->getFloatValue("marker/size", 1.0f);
     float pin_height = node->getFloatValue("marker/height", 1000.0f);
     float tip_height = node->getFloatValue("marker/tip-height", 0.0f);
-    object = fgCreateMarkerNode(osgText::String(label, osgText::String::ENCODING_UTF8), font_size, pin_height, tip_height, color);
+    marker = new FGMarker(osgText::String(label, osgText::String::ENCODING_UTF8), font_size, pin_height, tip_height, color);
+    object = marker->getMasterNode();
   }
   else if (internal_model == "external") {
     try {
@@ -168,6 +174,7 @@ FGModelMgr::add_model (SGPropertyNode * node)
   SGModelPlacement *model = new SGModelPlacement;
   instance->model = model;
   instance->node = node;
+  instance->marker = marker;
 
   model->init( object );
     double lon = node->getDoubleValue("longitude-deg"),
@@ -299,6 +306,11 @@ void FGModelMgr::update(double dt)
         if (instance->heading_deg_node != 0)
             model->setHeadingDeg(heading);
 
+        if (instance->marker) {
+            float distance = SGGeodesy::distanceNm(pos, globals->get_view_position());
+            instance->marker->setDistance(distance);
+        }
+
         instance->model->update();
         instance->checkLoaded();
     });
@@ -316,6 +328,8 @@ FGModelMgr::remove_instance (Instance * instance)
     std::vector<Instance *>::iterator it;
     for (it = _instances.begin(); it != _instances.end(); it++) {
         if (*it == instance) {
+            if (instance->marker)
+                delete instance->marker;
             _instances.erase(it);
             delete instance;
             return;
@@ -410,6 +424,8 @@ FGModelMgr::Listener::childRemoved(SGPropertyNode * parent, SGPropertyNode * chi
           globals->get_scenery()->get_scene_graph()->removeChild(branch);
       }
 
+    if (instance->marker)
+        delete instance->marker;
     delete instance;
     break;
   }
