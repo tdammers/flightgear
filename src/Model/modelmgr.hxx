@@ -52,7 +52,7 @@ public:
         SGPropertyNode_ptr pitch_deg_node;
         SGPropertyNode_ptr heading_deg_node;
         SGPropertyNode_ptr loaded_node;
-        FGMarker * marker = nullptr;
+        SGSharedPtr<FGMarker> marker;
         bool shadow = false;
 
         bool checkLoaded() const;

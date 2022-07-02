@@ -111,10 +111,6 @@ void FGModelMgr::shutdown()
             scene_graph->removeChild(_instances[i]->model->getSceneGraph());
         }
 
-        if (_instances[i]->marker) {
-            delete _instances[i]->marker;
-        }
-
         delete _instances[i];
     }
 }
@@ -131,7 +127,7 @@ FGModelMgr::add_model (SGPropertyNode * node)
     const std::string internal_model{node->getStringValue("internal-model", "external")};
  
   osg::Node *object;
-  FGMarker *marker = nullptr;
+  SGSharedPtr<FGMarker> marker;
 
   Instance * instance = new Instance;
   instance->loaded_node = node->addChild("loaded");
@@ -328,8 +324,6 @@ FGModelMgr::remove_instance (Instance * instance)
     std::vector<Instance *>::iterator it;
     for (it = _instances.begin(); it != _instances.end(); it++) {
         if (*it == instance) {
-            if (instance->marker)
-                delete instance->marker;
             _instances.erase(it);
             delete instance;
             return;

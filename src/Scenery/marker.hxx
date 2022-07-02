@@ -21,26 +21,21 @@ class FGMarker : public SGReferenced
 {
 public:
     FGMarker();
-    FGMarker(const osgText::String& label, float font_size = 32.0f, float pin_height = 500.0f, float tip_height = 0.0f);
+    FGMarker(const osgText::String& label, float _fontSize = 32.0f, float _pinHeight = 500.0f, float _tipHeight = 0.0f);
     FGMarker(const osgText::String& label, const osg::Vec4f& color);
-    FGMarker(const osgText::String& label, float font_size, float pin_height, const osg::Vec4f& color);
-    FGMarker(const osgText::String& label, float font_size, const osg::Vec4f& color);
-    FGMarker(const osgText::String& label, float font_size, float pin_height, float tip_height, const osg::Vec4f& color);
+    FGMarker(const osgText::String& label, float _fontSize, float _pinHeight, const osg::Vec4f& color);
+    FGMarker(const osgText::String& label, float _fontSize, const osg::Vec4f& color);
+    FGMarker(const osgText::String& label, float _fontSize, float _pinHeight, float _tipHeight, const osg::Vec4f& color);
     virtual ~FGMarker();
-    virtual void setText(const osgText::String& label);
-    virtual void setFontSize(float);
-    virtual void setDistance(float);
-    virtual void setScaling(float);
-    virtual const char* className() const { return "FGMarker"; }
-    virtual osg::Node* getMasterNode() const { return masterNode; }
+    void setText(const osgText::String& label);
+    void setFontSize(float);
+    void setDistance(float);
+    void setScaling(float);
+    virtual osg::ref_ptr<osg::Node> getMasterNode() const { return _masterNode; }
 private:
-    float font_size;
-    float pin_height;
-    float tip_height;
-    osg::Vec4f color;
-    osgText::Text* labelText;
-    osgText::Text* distanceText;
-    osg::Group* masterNode;
-    osg::MatrixTransform* scaleTransform;
+    osgText::Text* _labelText;
+    osgText::Text* _distanceText;
+    osg::ref_ptr<osg::Group> _masterNode;
+    osg::MatrixTransform* _scaleTransform;
 };
 
