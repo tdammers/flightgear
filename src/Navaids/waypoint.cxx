@@ -269,14 +269,24 @@ void RunwayWaypt::writeToProperties(SGPropertyNode_ptr aProp) const
 Hold::Hold(const SGGeod& aPos, const string& aIdent, RouteBase* aOwner) :
   BasicWaypt(aPos, aIdent, aOwner),
   _righthanded(true),
-  _isDistance(false)
+  _isDistance(false),
+  _origWaypt(0)
 {
 }
 
 Hold::Hold(RouteBase* aOwner) :
   BasicWaypt(aOwner),
   _righthanded(true),
-  _isDistance(false)
+  _isDistance(false),
+  _origWaypt(0)
+{
+}
+
+Hold::Hold(WayptRef aWaypt) :
+  BasicWaypt(aWaypt->position(), aWaypt->ident(), aWaypt->owner()),
+  _righthanded(true),
+  _isDistance(false),
+  _origWaypt(aWaypt)
 {
 }
 

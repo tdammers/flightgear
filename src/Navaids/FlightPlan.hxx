@@ -127,6 +127,7 @@ public:
     
       
     bool convertWaypointToHold();
+    bool convertWaypointFromHold();
       
     unsigned int index() const;
 

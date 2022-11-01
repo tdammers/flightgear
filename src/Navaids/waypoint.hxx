@@ -145,6 +145,7 @@ class Hold : public BasicWaypt
 {
 public:
   Hold(const SGGeod& aPos, const std::string& aIdent, RouteBase* aOwner);
+  Hold(WayptRef origWaypt);
   
   Hold(RouteBase* aOwner);
   
@@ -169,6 +170,9 @@ public:
   
   virtual double headingRadialDeg() const
   { return inboundRadial(); }
+
+  WayptRef origWaypt() const
+  { return _origWaypt; }
 protected:
     bool initFromProperties(SGPropertyNode_ptr aProp) override;
     void writeToProperties(SGPropertyNode_ptr aProp) const override;
@@ -181,6 +185,7 @@ private:
   bool _righthanded;
   bool _isDistance;
   double _holdTD;
+  WayptRef _origWaypt;
 };
 
 class HeadingToAltitude : public Waypt

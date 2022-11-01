@@ -1677,7 +1677,7 @@ bool FlightPlan::Leg::convertWaypointToHold()
     return false;
   }
   
-  auto hold = new Hold(_waypt->position(), _waypt->ident(), const_cast<FlightPlan*>(_parent));
+  auto hold = new Hold(_waypt);
   
   // default to a 1 minute hold with the radial being our arrival radial
   hold->setHoldTime(60.0);
@@ -1688,12 +1688,28 @@ bool FlightPlan::Leg::convertWaypointToHold()
   
   return true;
 }
+
+bool FlightPlan::Leg::convertWaypointFromHold()
+{
+  const auto wty = _waypt->type();
+  if (wty != "hold") return true; // already a non-hold
+
+  const auto hold = static_cast<Hold*>(_waypt.ptr());
+  if (hold->origWaypt()) {
+    _waypt = hold->origWaypt();
+    return true;
+  }
+  else {
+    SG_LOG(SG_INSTR, SG_WARN, "convertWaypointFromHold: cannot convert waypt " << index() << " " << _waypt->ident() << " to a non-hold, because the original waypoint was lost");
+    return false;
+  }
+}
     
 bool FlightPlan::Leg::setHoldCount(int count)
 {
-  if (count == 0) {
-    _holdCount = count;
-    return true;
+  if (count <= 0) {
+    _holdCount = 0;
+    return convertWaypointFromHold();
   }
     
   if (!convertWaypointToHold()) {
