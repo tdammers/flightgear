@@ -290,6 +290,21 @@ Hold::Hold(WayptRef aWaypt) :
 {
 }
 
+Hold::Hold(const Hold& rhs) :
+  BasicWaypt(rhs.position(), rhs.ident(), rhs.owner()),
+  _bearing(rhs._bearing),
+  _righthanded(rhs._righthanded),
+  _isDistance(rhs._isDistance),
+  _holdTD(rhs._holdTD),
+  _origWaypt(rhs._origWaypt ? rhs._origWaypt->cloneOrRef() : 0)
+{
+}
+
+WayptRef Hold::cloneOrRef() const
+{
+  return new Hold(*this);
+}
+
 void Hold::setHoldRadial(double aInboundRadial)
 {
   _bearing = aInboundRadial;

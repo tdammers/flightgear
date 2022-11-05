@@ -1560,7 +1560,7 @@ FlightPlan::Leg::Leg(FlightPlan* owner, WayptRef wpt) :
 
 FlightPlan::Leg* FlightPlan::Leg::cloneFor(FlightPlan* owner) const
 {
-  Leg* c = new Leg(owner, _waypt);
+  Leg* c = new Leg(owner, _waypt->cloneOrRef());
 // clone local data
   c->_speed = _speed;
   c->_speedRestrict = _speedRestrict;

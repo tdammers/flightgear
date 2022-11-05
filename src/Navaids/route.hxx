@@ -108,6 +108,20 @@ public:
   
     RouteBase* owner() const
     { return const_cast<RouteBase*>(_owner); }
+
+  /**
+   * Return either a reference or a clone. If the waypoint is immutable in the
+   * context of a flightplan (i.e., it is not possible to change the waypoint
+   * parameter via flightplan commands or Nasal bindings), then a reference
+   * may be returned; otherwise, the waypoint should be cloned.
+   */
+  virtual WayptRef cloneOrRef() const
+    {
+      // Casting away the const-ness is morally correct here, because the
+      // waypoint is conceptually immutable.
+      return WayptRef(const_cast<Waypt*>(this));
+    }
+
          	
 	virtual SGGeod position() const = 0;
 	

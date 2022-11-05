@@ -146,7 +146,7 @@ class Hold : public BasicWaypt
 public:
   Hold(const SGGeod& aPos, const std::string& aIdent, RouteBase* aOwner);
   Hold(WayptRef origWaypt);
-  
+  Hold(const Hold& rhs);
   Hold(RouteBase* aOwner);
   
   void setHoldRadial(double aInboundRadial);
@@ -173,6 +173,8 @@ public:
 
   WayptRef origWaypt() const
   { return _origWaypt; }
+
+  virtual WayptRef cloneOrRef() const override;
 protected:
     bool initFromProperties(SGPropertyNode_ptr aProp) override;
     void writeToProperties(SGPropertyNode_ptr aProp) const override;
