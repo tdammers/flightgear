@@ -317,6 +317,48 @@ static naRef waypointRunway(naContext c, Waypt* wpt)
     return ghostForRunway(c, static_cast<FGRunway*>(pos));
 }
 
+static naRef f_setHoldDistance(naContext c, naRef me, int argc, naRef* args)
+{
+    double distance = 0.0;
+    const auto wpt = wayptGhost(me);
+    if (wpt->type() != "hold") {
+        naRuntimeError(c, "hold.setDistance called on non-hold object");
+    }
+    const auto hold = static_cast<Hold*>(wayptGhost(me));
+    if (argc == 0) {
+        naRuntimeError(c, "missing argument to setDistance");
+    }
+    if (naIsNil(args[0])) {
+        naRuntimeError(c, "bad argument to setDistance (nil)");
+    }
+    if (!convertToNum(args[0], distance)) {
+        naRuntimeError(c, "bad argument to setDistance (not a number)");
+    }
+    hold->setHoldDistance(distance);
+    return naNil();
+}
+
+static naRef f_setHoldTime(naContext c, naRef me, int argc, naRef* args)
+{
+    double time = 0.0;
+    const auto wpt = wayptGhost(me);
+    if (wpt->type() != "hold") {
+        naRuntimeError(c, "hold.setTime called on non-hold object");
+    }
+    const auto hold = static_cast<Hold*>(wayptGhost(me));
+    if (argc == 0) {
+        naRuntimeError(c, "missing argument to setTime");
+    }
+    if (naIsNil(args[0])) {
+        naRuntimeError(c, "bad argument to setTime (nil)");
+    }
+    if (!convertToNum(args[0], time)) {
+        naRuntimeError(c, "bad argument to setTime (not a number)");
+    }
+    hold->setHoldTime(time);
+    return naNil();
+}
+
 static const char* waypointCommonGetMember(naContext c, Waypt* wpt, const char* fieldName, naRef* out)
 {
     if (!strcmp(fieldName, "wp_name") || !strcmp(fieldName, "id"))
@@ -394,6 +436,10 @@ static const char* waypointCommonGetMember(naContext c, Waypt* wpt, const char* 
             // This is the leg length, defined either as a time in seconds, or a
             // distance in nm.
             *out = naNum(hold->timeOrDistance());
+        } else if (!strcmp(fieldName, "setHoldTime")) {
+            *out = naNewFunc(c, naNewCCode(c, f_setHoldTime));
+        } else if (!strcmp(fieldName, "setHoldDistance")) {
+            *out = naNewFunc(c, naNewCCode(c, f_setHoldDistance));
         } else {
             return nullptr; // member not found
         }
@@ -424,7 +470,7 @@ static bool waypointCommonSetMember(naContext c, Waypt* wpt, const char* fieldNa
         wpt->setFlag(WPT_HIDDEN, static_cast<int>(value.num) != 0);
     } else if (wpt->type() == "hold") {
         const auto hold = static_cast<Hold*>(wpt);
-        if (!strcmp(fieldName, "hold_heading_radial_deg")) {
+        if (!strcmp(fieldName, "hold_heading_radial_deg") || !strcmp(fieldName, "hold_inbound_radial")) {
             if (!naIsNum(value)) naRuntimeError(c, "set hold_heading_radial_deg: invalid hold radial");
             hold->setHoldRadial(value.num);
         } else if (!strcmp("hold_is_left_handed", fieldName)) {
