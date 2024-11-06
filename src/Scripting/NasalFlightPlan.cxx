@@ -545,14 +545,16 @@ static const char* legGhostGetMember(naContext c, void* g, naRef field, naRef* o
         naVec_append(*out, fpLegPrototype);
     } else if (!strcmp(fieldName, "index")) {
         *out = naNum(leg->index());
-    } else if (!strcmp(fieldName, "alt_cstr")) {
+    } else if (!strcmp(fieldName, "alt_cstr") || !strcmp(fieldName, "constraint_altitude")) {
         *out = naNum(leg->altitudeFt());
-    } else if (!strcmp(fieldName, "alt_cstr_type")) {
+    } else if (!strcmp(fieldName, "secondary_constraint_altitude")) {
+        *out = naNum(leg->waypoint()->constraintAltitude());
+    } else if (!strcmp(fieldName, "alt_cstr_type") || !strcmp(fieldName, "altitude_constraint_type")) {
         *out = routeRestrictionToNasal(c, leg->altitudeRestriction());
-    } else if (!strcmp(fieldName, "speed_cstr")) {
+    } else if (!strcmp(fieldName, "speed_cstr") || !strcmp(fieldName, "constraint_speed")) {
         double s = isMachRestrict(leg->speedRestriction()) ? leg->speedMach() : leg->speedKts();
         *out = naNum(s);
-    } else if (!strcmp(fieldName, "speed_cstr_type")) {
+    } else if (!strcmp(fieldName, "speed_cstr_type") || !strcmp(fieldName, "speed_constraint_type")) {
         *out = routeRestrictionToNasal(c, leg->speedRestriction());
     } else if (!strcmp(fieldName, "leg_distance")) {
         *out = naNum(leg->distanceNm());
@@ -2053,7 +2055,7 @@ static naRef f_leg_setAltitude(naContext c, naRef me, int argc, naRef* args)
                 naRuntimeError(c, "leg.setAltitude: passed a 2-tuple, but restriction type is not 'between'");
             }
             
-            double constraintAltitude;
+            double constraintAltitude = altitude;
             const auto ok = convertToNum(naVec_get(altTuple, 0), constraintAltitude)
                 && convertToNum(naVec_get(altTuple, 1), altitude);
             if (!ok) {
@@ -2064,7 +2066,7 @@ static naRef f_leg_setAltitude(naContext c, naRef me, int argc, naRef* args)
                 units = routeUnitsFromArg(args[2]);
             }
             
-            // TODO: store constraint altitude
+            leg->waypoint()->setConstraintAltitude(constraintAltitude);
         }
 
         leg->setAltitude(rr, altitude, units);

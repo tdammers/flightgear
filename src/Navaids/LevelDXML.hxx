@@ -50,7 +50,7 @@ private:
   std::string _wayptType;
   std::string _ident; // id of segment under construction
   std::string _transIdent;
-  double _longitude, _latitude, _altitude, _speed;
+  double _longitude, _latitude, _altitude, _altitudeConstraint, _speed;
   RouteRestriction _altRestrict;
   bool _overflightWaypt;
   

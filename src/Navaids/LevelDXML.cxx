@@ -71,6 +71,7 @@ void NavdataVisitor::startElement(const char* name, const XMLAttributes &atts)
     _speed = 0.0;
     _altRestrict = RESTRICT_NONE;
     _altitude = 0.0;
+    _altitudeConstraint = 0.0;
     _overflightWaypt = false; // default to Fly-by
     _courseFlag = false; // default to heading
   } else if (tag == "Approach") {
@@ -203,6 +204,8 @@ void NavdataVisitor::endElement(const char* name)
     _speed = atoi(_text.c_str());
   } else if (tag == "Altitude") {
     _altitude = atof(_text.c_str());
+  } else if (tag == "AltitudeCons") {
+    _altitudeConstraint = atof(_text.c_str());
   } else if (tag == "AltitudeRestriction") {
       _altRestrict = restrictionFromString(_text);
   } else if (tag == "Hld_Rad_or_Inbd") {
@@ -308,6 +311,9 @@ Waypt* NavdataVisitor::buildWaypoint(RouteBase* owner)
   assert(wp);
   if ((_altitude > 0.0) && (_altRestrict != RESTRICT_NONE)) {
     wp->setAltitude(_altitude,_altRestrict);
+  }
+  if ((_altitudeConstraint > 0.0) && (_altRestrict == RESTRICT_BETWEEN)) {
+    wp->setConstraintAltitude(_altitudeConstraint);
   }
   
   if (_speed > 0.0) {
